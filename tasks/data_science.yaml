@@ -1,0 +1,38 @@
+tasks:
+
+  nlp:
+    type: python
+    class: nlp.LanguageProcessing
+    parents:
+      - message_category_correction
+    parameters:
+      table: message_category_correction
+      text:
+        - content
+
+  # Generates wordclouds for every link in load_data
+  # The stopwords parameter adds additional stopwords to our task
+  wordcloud:
+    type: python
+    class: wordcloud.RenderCloud
+    parents:
+      - message_category_correction
+    parameters:
+      table: message_category_correction
+      stopwords:
+        - PLACEHOLDER
+        - fuck
+        - fucking
+        - shit
+        - Jay
+
+  photo_mosaic:
+    type: python
+    class: photo_mosaic.RenderMosaic
+    parameters:
+      target: "python/img/target.jpg"
+      images: "python/messenger_data/user_1/photos"
+      output: "python/img/mosaic.jpeg"
+      grid:
+        - 100
+        - 100

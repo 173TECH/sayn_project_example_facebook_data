@@ -1,0 +1,19 @@
+# This tutorial is composed of one task group (base)
+# Please see the task overview section of the documentation for more details:
+# https://173tech.github.io/sayn/tasks/overview/
+
+# Task groups define at minimum a set of tasks
+# To run the tutorial, run the command 'sayn run' from the project folder's root
+tasks:
+
+  load_chat_data:
+    type: python
+    class: load_messenger_data.LoadData
+    parameters:
+      table: logs_chat_data
+
+  # load_img_data:
+  #   type: python
+  #   class: load_messenger_data.LoadData
+  #   parameters:
+  #     table: logs_img_data

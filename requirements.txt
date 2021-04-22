@@ -1,0 +1,7 @@
+sayn
+numpy
+pandas
+matplotlib
+Pillow
+wordcloud
+nltk

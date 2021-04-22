@@ -1,0 +1,6 @@
+tasks:
+
+  message_category_correction:
+    preset: modelling
+    parents:
+      - load_chat_data
