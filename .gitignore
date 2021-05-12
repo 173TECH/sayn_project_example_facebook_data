@@ -12,6 +12,7 @@ prod.db
 *_timelapse.gif
 mosaic.jpeg
 /python/img/stickers_used
+/secrets/
 
 
 # Python ignores

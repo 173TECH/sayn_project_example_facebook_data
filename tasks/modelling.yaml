@@ -9,3 +9,8 @@ tasks:
     preset: modelling
     parents:
       - load_chat_data
+
+  youtube_links:
+    preset: modelling
+    parents:
+      - load_chat_data

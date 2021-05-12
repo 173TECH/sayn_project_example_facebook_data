@@ -53,3 +53,11 @@ tasks:
       grid:
         - 10
         - 10
+
+  youtube_playlists:
+    type: python
+    class: youtube_playlists.AutoPlaylist
+    parents:
+      - youtube_links
+    parameters:
+      table: youtube_links
