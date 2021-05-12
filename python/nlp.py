@@ -1,11 +1,10 @@
-### Uncomment the block below if you do not have punkt installed, you only need to run this once ###
-# import nltk
-# nltk.download('punkt')
-
 import pandas as pd
 from sayn import PythonTask
+from nltk import download
 from nltk.tokenize import word_tokenize, sent_tokenize
+from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 
+download('punkt')
 
 class LanguageProcessing(PythonTask):
 
@@ -23,7 +22,6 @@ class LanguageProcessing(PythonTask):
         # counts the number of sentences in text_field
 
         df[text_field +"_sentences"] = df[text_field].fillna("").apply(lambda x: len(sent_tokenize(x, language=language)))
-
 
     def setup(self):
         self.set_run_steps(
@@ -43,10 +41,12 @@ class LanguageProcessing(PythonTask):
             text_fields = self.parameters["text"]
 
             df = pd.DataFrame(self.default_db.read_data(f"SELECT * FROM {table}"))
+            analyser = SentimentIntensityAnalyzer()
 
             for t in text_fields:
                 self.info(f"Processing texts for {t} field")
                 self.desc_text(df, t, "english")
+                df["sentiment"] = df[t].apply(lambda text: analyser.polarity_scores(text)["compound"])
 
 
         with self.step("Updating database"):

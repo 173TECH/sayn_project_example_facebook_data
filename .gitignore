@@ -7,6 +7,12 @@ dev.db
 prod.db
 .git
 .DS_Store
+*_wordcloud.png
+*_collage.png
+*_timelapse.gif
+mosaic.jpeg
+/python/img/stickers_used
+
 
 # Python ignores
 # https://github.com/github/gitignore/blob/master/Python.gitignore

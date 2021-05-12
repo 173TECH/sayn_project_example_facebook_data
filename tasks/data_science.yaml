@@ -24,7 +24,11 @@ tasks:
         - fuck
         - fucking
         - shit
-        - Jay
+        - really
+        - mean
+        - going
+        - gonna
+
 
   photo_mosaic:
     type: python
@@ -36,3 +40,16 @@ tasks:
       grid:
         - 100
         - 100
+
+  sticker_collage:
+    type: python
+    class: collage_creator.RenderCollage
+    parameters:
+      images: "python/img/stickers_used"
+      output: "python/img/"
+      resolution:
+        - 1920
+        - 1080
+      grid:
+        - 10
+        - 10

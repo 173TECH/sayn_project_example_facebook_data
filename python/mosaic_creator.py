@@ -8,13 +8,16 @@ def getImages(images_directory):
     for file in files:
         filePath = os.path.abspath(os.path.join(images_directory, file))
         try:
-            fp = open(filePath, "rb")
-            im = Image.open(fp)
-            images.append(im)
+            fp = open(filePath, "r+b")
+            im = Image.open(fp).convert("RGBA")
+            img = Image.new("RGBA", im.size, "WHITE")
+            img.paste(im, (0, 0), im)
+            img.convert('RGB')
+            images.append(img)
             im.load()
             fp.close()
-        except:
-            print("Invalid image: %s" % (filePath,))
+        except Exception as e:
+            print(f"{e}\nInvalid image: {filePath}")
     return (images)
 
 
@@ -51,11 +54,11 @@ def getBestMatchIndex(input_avg, avgs):
     return (min_index)
 
 
-def createImageGrid(images, dims):
+def createImageGrid(images, dims, color = None):
     m, n = dims
     width = max([img.size[0] for img in images])
     height = max([img.size[1] for img in images])
-    grid_img = Image.new('RGB', (n * width, m * height))
+    grid_img = Image.new('RGB', (n * width, m * height), color)
     for index in range(len(images)):
         row = int(index / n)
         col = index - n * row

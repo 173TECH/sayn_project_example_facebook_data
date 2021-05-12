@@ -1,7 +1,7 @@
 import random
 from sayn import PythonTask
 from PIL import Image
-from .mosaic_creator import getImages, getAverageRGB, splitImage, getBestMatchIndex, createImageGrid, createPhotomosaic
+from .mosaic_creator import getImages, createPhotomosaic
 
 
 class RenderMosaic(PythonTask):
@@ -17,7 +17,7 @@ class RenderMosaic(PythonTask):
 
     def run(self):
 
-        with self.step("Testing Image Data"):
+        with self.step("Assigning Parameters"):
             target = self.task_parameters["target"]
             images = self.task_parameters["images"]
             grid = self.task_parameters["grid"]
@@ -28,12 +28,12 @@ class RenderMosaic(PythonTask):
             target_image = Image.open(target)
 
             # input images
-            print('reading input folder...')
+            self.info(f"Reading input folder {images}")
             input_images = getImages(images)
 
             # check if any valid input images found
             if input_images == []:
-                print('No input images found in %s. Exiting.' % (images,))
+                self.info(f"No input images found in {images}")
                 exit()
 
             # shuffle list - to get a more varied output?
@@ -53,21 +53,21 @@ class RenderMosaic(PythonTask):
             # resize the input to fit original image size?
             resize_input = True
 
-            print('starting photomosaic creation...')
+            self.info('Starting photomosaic creation...')
 
             # if images can't be reused, ensure m*n <= num_of_images
             if not reuse_images:
                 if grid_size[0] * grid_size[1] > len(input_images):
-                    print('grid size less than number of images')
+                    self.info('Grid size less than number of images')
                     exit()
 
             # resizing input
             if resize_input:
-                print('resizing images...')
+                self.info('Resizing images...')
                 # for given grid size, compute max dims w,h of tiles
                 dims = (int(target_image.size[0] / grid_size[1]),
                         int(target_image.size[1] / grid_size[0]))
-                print("max tile dims: %s" % (dims,))
+                self.info(f"max tile dims: {dims}")
                 # resize
                 for img in input_images:
                     img.thumbnail(dims)
@@ -78,8 +78,7 @@ class RenderMosaic(PythonTask):
             # write out mosaic
             mosaic_image.save(output_filename, 'jpeg')
 
-            print("saved output to %s" % (output_filename,))
-            print('done.')
+            self.info(f"Saved output to {output_filename}")
 
 
         return self.success()

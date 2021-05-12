@@ -3,8 +3,21 @@ from os import listdir
 import json
 from datetime import datetime
 import pandas as pd
+import unicodedata as ud
 
 class LoadData(PythonTask):
+
+    def try_get_value(self, x, column):
+        try:
+            return x.get(column)
+        except:
+            pass
+
+    def try_fix_emoji(self, x):
+        try:
+            return str(x).encode('latin1').decode('utf8')
+        except:
+            pass
 
     def setup(self):
         self.set_run_steps(
@@ -21,28 +34,75 @@ class LoadData(PythonTask):
 
             table = self.project_parameters["user_prefix"]+ self.task_parameters["table"]
 
-            files = ["python/messenger_data/user_1/" + m for m in listdir("python/messenger_data/user_1") if m.startswith("message_")]
+            users = listdir("python/messenger_data/")
 
-            for i, file in enumerate(files):
-                with open(file) as text:
-                    data = json.load(text)
-                    text.close()
-                temp_df = pd.DataFrame(data["messages"])
-                if i == 0:
-                    main_df = temp_df
-                else:
-                    main_df = main_df.append(temp_df, ignore_index=True)
+            users.remove('.DS_Store')
 
-            main_df = main_df.iloc[:, :5].fillna("no_data")
+            for user in users:
+                files = [f"python/messenger_data/{user}/" + m for m in listdir(f"python/messenger_data/{user}") if m.startswith("message_")]
+
+                for file in files:
+                    with open(file) as text:
+                        data = json.load(text)
+                        text.close()
+                    temp_df = pd.DataFrame(data["messages"])
+                    temp_df["chat_with"] = user
+                    try:
+                        main_df = main_df.append(temp_df, ignore_index=True)
+                    except NameError:
+                        main_df = temp_df
+
+            main_df.loc[main_df.sender_name != 'Tim Sugaipov', 'sender_name'] = main_df["chat_with"]
+
+            full_df = main_df.copy()
+
+            columns_to_drop = ["share", "photos", "reactions", "sticker", "gifs", "files", "videos", "audio_files"]
+
+            main_df["share_link"] = main_df["share"].apply(self.try_get_value, args = ("link",))
+
+            main_df["share_text"] = main_df["share"].apply(self.try_get_value, args = ("share_text",))
+
+            main_df = main_df.drop(columns = columns_to_drop)
+
+            main_df["content"] = main_df["content"].fillna("")
 
             main_df.loc[main_df["content"].str.contains("https:", case=False), "type"] = "Share"
+
+            main_df["content"] = main_df["content"].apply(self.try_fix_emoji)
 
         with self.step("Load Data"):
             if main_df is not None:
 
-                main_df.to_sql( table
-                           ,self.default_db.engine
-                           ,if_exists="replace"
-                           ,index=False)
+                main_df.to_sql(table
+                             , self.default_db.engine
+                             , if_exists="replace"
+                             , index=False)
+
+            for i in columns_to_drop:
+                columns_to_keep = ["chat_with", "sender_name", "timestamp_ms", i]
+                if i == "share":
+                    full_df["share_link"] = full_df["share"].apply(self.try_get_value, args = ("link",))
+                    full_df["share_text"] = full_df["share"].apply(self.try_get_value, args = ("share_text",))
+                    columns_to_keep.extend(["share_link", "share_text"])
+                elif i == "sticker":
+                    full_df["sticker_link"] = full_df["sticker"].apply(self.try_get_value, args = ("uri",))
+                    columns_to_keep.extend(["sticker_link"])
+                else:
+                    full_df = full_df.explode(i, ignore_index = True)
+                    if i != "reactions":
+                        full_df[i + "_link"] = full_df[i].apply(self.try_get_value, args = ("uri",))
+                        columns_to_keep.extend([i + "_link"])
+                    else:
+                        full_df[i + "_type"] = full_df[i].apply(self.try_get_value, args = ("reaction",))
+                        full_df[i + "_type"] = full_df[i + "_type"].apply(self.try_fix_emoji)
+                        full_df[i + "_actor"] = full_df[i].apply(self.try_get_value, args = ("actor",))
+                        columns_to_keep.extend(["reactions_type", "reactions_actor"])
+
+                full_df[i] = full_df[i].astype(str)
+                data_to_write = full_df.loc[full_df[i] != 'nan', columns_to_keep]
+                data_to_write.to_sql(i
+                                   , self.default_db.engine
+                                   , if_exists="replace"
+                                   , index=False)
 
         return self.success()

@@ -4,3 +4,8 @@ tasks:
     preset: modelling
     parents:
       - load_chat_data
+
+  sticker_counts:
+    preset: modelling
+    parents:
+      - load_chat_data
