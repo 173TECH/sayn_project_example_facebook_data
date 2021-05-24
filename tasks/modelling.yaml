@@ -1,11 +1,21 @@
 tasks:
 
-  message_category_correction:
+  message_reply_time:
     preset: modelling
     parents:
       - load_chat_data
 
   sticker_counts:
+    preset: modelling
+    parents:
+      - load_chat_data
+
+  youtube_links:
+    preset: modelling
+    parents:
+      - load_chat_data
+
+  frequent_sites:
     preset: modelling
     parents:
       - load_chat_data

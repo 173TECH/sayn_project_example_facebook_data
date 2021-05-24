@@ -6,3 +6,5 @@ Pillow
 wordcloud
 nltk
 vaderSentiment
+google-auth-oauthlib
+google-api-python-client

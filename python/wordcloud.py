@@ -22,13 +22,39 @@ class RenderCloud(PythonTask):
         for i in images:
             os.remove(i)
 
-    def word_cloud(self, name, text, stopwords, b_colour = "white", c_colour = "black", show=False, sender = None):
+    def create_gif(self, images, chat_and_sender):
+        loaded_images = self.load_images(images)
+        gif_images = []
+        durations = []
+        for i in range(1, len(loaded_images) + 1):
+            if i == len(loaded_images):
+                img1, img2 = loaded_images[-1], loaded_images[0]
+                title1, title2 = images[-1][-18:-14], images[0][-18:-14]
+            else:
+                img1, img2 = loaded_images[i-1], loaded_images[i]
+                title1, title2 = images[i-1][-18:-14], images[i][-18:-14]
+            d1, d2 = ImageDraw.Draw(img1), ImageDraw.Draw(img2)
+            font = ImageFont.truetype("OpenSans-Bold.ttf", 50)
+            d1.text((0,0), title1, font=font, fill=(0, 0, 0))
+            d2.text((0,0), title2, font=font, fill=(0, 0, 0))
+            gif_images.extend([Image.blend(img1, img2, a/5) for a in range(0,6)])
+            durations.extend([1000 if t in (0,5) else 1 for t in range(0,6)])
+        file_path = f"python/img/{chat_and_sender}_timelapse.gif"
+        gif_images[0].save(file_path
+                           , save_all = True
+                           , append_images=gif_images[1:]
+                           , optimize = False
+                           , duration = durations
+                           , loop = 0)
+        self.remove_images(images)
+
+    def word_cloud(self, name, text, stopwords, b_colour = "white", c_colour = "black", show=False, sender=None):
         """Word cloud generating function"""
 
         # attempt to find a compatible mask
 
         try:
-            if sender == "Tim Sugaipov":
+            if sender == self.task_parameters["facebook_name"]:
                 mask = np.array(Image.open(f"python/img/masks/Me_mask.png"))
             else:
                 mask = np.array(Image.open(f"python/img/masks/Friend_mask.png"))
@@ -90,44 +116,20 @@ class RenderCloud(PythonTask):
 
             # Source specific wordclouds
 
+            images = {}
+
             for group, text in zip(grouped_texts.keys(), grouped_texts):
                 chat, sender, year = group
                 chat_and_sender = chat + "_" + sender
                 name = chat + "_" + sender + "_" + year
                 self.info(f"Generating {name}_wordcloud.png")
-                self.word_cloud(name, text, stopwords, sender = sender)
-                try:
-                    if images[-1].startswith(f"python/img/{chat_and_sender}"):
-                        images.append(f"python/img/{name}_wordcloud.png")
-                    else:
-                        loaded_images = self.load_images(images)
-                        gif_images = []
-                        durations = []
-                        for i in range(1, len(loaded_images) + 1):
-                            if i == len(loaded_images):
-                                img1, img2 = loaded_images[-1], loaded_images[0]
-                                title1, title2 = images[-1][-18:-14], images[0][-18:-14]
-                            else:
-                                img1, img2 = loaded_images[i-1], loaded_images[i]
-                                title1, title2 = images[i-1][-18:-14], images[i][-18:-14]
-                            d1, d2 = ImageDraw.Draw(img1), ImageDraw.Draw(img2)
-                            font = ImageFont.truetype("OpenSans-Bold.ttf", 50)
-                            d1.text((0,0), title1, font=font, fill=(0, 0, 0))
-                            d2.text((0,0), title2, font=font, fill=(0, 0, 0))
-                            gif_images.extend([Image.blend(img1, img2, a/5) for a in range(0,6)])
-                            durations.extend([1000 if t in (0,5) else 1 for t in range(0,6)])
-                        file_path = f"python/img/{chat_and_sender}_timelapse.gif"
-                        gif_images[0].save(
-                        file_path
-                        , save_all = True
-                        , append_images=gif_images[1:]
-                        , optimize = False
-                        , duration = durations
-                        , loop = 0)
-                        self.remove_images(images)
-                        images = [f"python/img/{name}_wordcloud.png"]
-                except:
-                    images = []
-                    images.append(f"python/img/{name}_wordcloud.png")
+                self.word_cloud(name, text, stopwords, sender=sender)
+                if chat_and_sender in images.keys():
+                    images[chat_and_sender].append(f"python/img/{name}_wordcloud.png")
+                else:
+                    images[chat_and_sender] = [f"python/img/{name}_wordcloud.png"]
+
+            for key in images.keys():
+                self.create_gif(images[key], key)
 
         return self.success()
