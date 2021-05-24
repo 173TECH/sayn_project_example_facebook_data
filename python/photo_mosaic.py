@@ -19,7 +19,7 @@ class RenderMosaic(PythonTask):
 
         with self.step("Assigning Parameters"):
             target = self.task_parameters["target"]
-            images = self.task_parameters["images"]
+            user_data = self.task_parameters["user_data"]
             grid = self.task_parameters["grid"]
             output = self.task_parameters["output"]
 
@@ -28,6 +28,7 @@ class RenderMosaic(PythonTask):
             target_image = Image.open(target)
 
             # input images
+            images = f"python/messenger_data/{user_data}/photos"
             self.info(f"Reading input folder {images}")
             input_images = getImages(images)
 

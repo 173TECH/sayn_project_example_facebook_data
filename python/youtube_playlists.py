@@ -1,4 +1,3 @@
-import os
 import google_auth_oauthlib.flow
 import googleapiclient.discovery
 import googleapiclient.errors
@@ -10,11 +9,11 @@ class AutoPlaylist(PythonTask):
     def run(self):
 
         table = self.project_parameters["user_prefix"]+ self.task_parameters["table"]
-        df = pd.DataFrame(self.default_db.read_data(f"SELECT video_id FROM {table} WHERE video_id IS NOT NULL"))
+        user = self.task_parameters["user"]
+        category = self.task_parameters["category"]
+        playlist_name = user + "_" + category
+        df = pd.DataFrame(self.default_db.read_data(f"SELECT DISTINCT video_id FROM {table} WHERE video_id IS NOT NULL AND chat_with = '{user}'"))
         scopes = ["https://www.googleapis.com/auth/youtube.force-ssl"]
-        # Disable OAuthlib's HTTPS verification when running locally.
-        # *DO NOT* leave this option enabled in production.
-        os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
 
         api_service_name = "youtube"
         api_version = "v3"
@@ -31,21 +30,55 @@ class AutoPlaylist(PythonTask):
         youtube = googleapiclient.discovery.build(
             api_service_name, api_version, credentials=creds)
 
-        request = youtube.playlists().insert(
-            part="snippet",
-            body={
-              "snippet": {
-                "title": "full_playlist_1"
-              }
-            }
+        request = youtube.playlists().list(
+            part="id, snippet",
+            mine=True
         )
-
-        # request = youtube.playlists().list(part="id, snippet", mine=True)
         response = request.execute()
 
-        playlist_id = response['id']
+        check = [item['id'] for item in response["items"] if item["snippet"]["title"] == playlist_name]
 
-        for video in df['video_id']:
+        if len(check) > 0:
+            playlist_id = check[0]
+        else:
+            request = youtube.playlists().insert(
+                part="snippet",
+                body={
+                  "snippet": {
+                    "title": playlist_name
+                  }
+                }
+            )
+            response = request.execute()
+            playlist_id = response['id']
+
+        list_of_ids = df['video_id'].to_list()
+        list_length = len(list_of_ids)
+
+        counter = 0
+        music_videos = []
+
+        while counter < list_length:
+            if counter + 50 < list_length:
+                video_ids = ",".join(list_of_ids[counter:counter+50])
+            else:
+                video_ids = ",".join(list_of_ids[counter:list_length])
+
+            request = youtube.videos().list(part="topicDetails",id=video_ids)
+            response = request.execute()
+
+            for x in response['items']:
+                try:
+                    for value in x["topicDetails"]["topicCategories"]:
+                        if value.lower().find("music") != -1 :
+                            music_videos.append(x['id'])
+                            break
+                except:
+                    pass
+
+            counter+=50
+
+        for video in music_videos:
             body = {
               "snippet": {
                 "playlistId": playlist_id,
@@ -55,7 +88,6 @@ class AutoPlaylist(PythonTask):
                 }
               }
             }
-            print(body)
             request = youtube.playlistItems().insert(
             part="snippet",
             body=body)
@@ -63,7 +95,5 @@ class AutoPlaylist(PythonTask):
                 response = request.execute()
             except:
                 pass
-            print(response)
-
 
         return self.success()

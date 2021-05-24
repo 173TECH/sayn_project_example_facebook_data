@@ -1,11 +1,16 @@
 from sayn import PythonTask
 from os import listdir
-import json
 from datetime import datetime
+from urllib.parse import urlsplit
+import json
 import pandas as pd
 import unicodedata as ud
 
+
 class LoadData(PythonTask):
+
+    def convert_time(self, x, format):
+        return datetime.fromtimestamp(x/1000).strftime(format)
 
     def try_get_value(self, x, column):
         try:
@@ -52,22 +57,21 @@ class LoadData(PythonTask):
                     except NameError:
                         main_df = temp_df
 
+            # Anonymise friends (remove when released)
             main_df.loc[main_df.sender_name != 'Tim Sugaipov', 'sender_name'] = main_df["chat_with"]
 
+            # Convert UNIX timestamps
+            main_df["created_dt"] = main_df["timestamp_ms"].apply(self.convert_time, args = ('%Y-%m-%d',))
+            main_df["created_ts"] = main_df["timestamp_ms"].apply(self.convert_time, args = ('%Y-%m-%d %H:%M:%S',))
+
+            # Unpack and process json parts of the data
             full_df = main_df.copy()
-
             columns_to_drop = ["share", "photos", "reactions", "sticker", "gifs", "files", "videos", "audio_files"]
-
             main_df["share_link"] = main_df["share"].apply(self.try_get_value, args = ("link",))
-
             main_df["share_text"] = main_df["share"].apply(self.try_get_value, args = ("share_text",))
-
             main_df = main_df.drop(columns = columns_to_drop)
-
             main_df["content"] = main_df["content"].fillna("")
-
             main_df.loc[main_df["content"].str.contains("https:", case=False), "type"] = "Share"
-
             main_df["content"] = main_df["content"].apply(self.try_fix_emoji)
 
         with self.step("Load Data"):
@@ -79,11 +83,12 @@ class LoadData(PythonTask):
                              , index=False)
 
             for i in columns_to_drop:
-                columns_to_keep = ["chat_with", "sender_name", "timestamp_ms", i]
+                columns_to_keep = ["chat_with", "sender_name", "timestamp_ms", "created_ts", "created_dt", i]
                 if i == "share":
                     full_df["share_link"] = full_df["share"].apply(self.try_get_value, args = ("link",))
                     full_df["share_text"] = full_df["share"].apply(self.try_get_value, args = ("share_text",))
-                    columns_to_keep.extend(["share_link", "share_text"])
+                    full_df["share_host"] = full_df["share_link"].apply(lambda x: urlsplit(x).hostname)
+                    columns_to_keep.extend(["share_link", "share_text", "share_host"])
                 elif i == "sticker":
                     full_df["sticker_link"] = full_df["sticker"].apply(self.try_get_value, args = ("uri",))
                     columns_to_keep.extend(["sticker_link"])

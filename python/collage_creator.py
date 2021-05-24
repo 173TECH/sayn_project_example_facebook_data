@@ -57,8 +57,9 @@ class RenderCollage(PythonTask):
                 stickers = df.loc[
                 (df["chat_with"] == chat)
                 & (df["sender_name"] == name)
-                , ["sticker_link"]]
-                input_images = self.getImages(stickers.sticker_link)
+                , ["sticker_link", "ranking"]]
+                stickers.sort_values(by = "ranking", inplace=True)
+                input_images = self.getImages(stickers["sticker_link"])
                 for img in input_images:
                     img.thumbnail(dims)
                 random.shuffle(input_images)

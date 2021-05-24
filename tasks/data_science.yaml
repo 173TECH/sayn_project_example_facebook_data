@@ -4,9 +4,9 @@ tasks:
     type: python
     class: nlp.LanguageProcessing
     parents:
-      - message_category_correction
+      - message_reply_time
     parameters:
-      table: message_category_correction
+      table: message_reply_time
       text:
         - content
 
@@ -16,26 +16,19 @@ tasks:
     type: python
     class: wordcloud.RenderCloud
     parents:
-      - message_category_correction
+      - message_reply_time
     parameters:
-      table: message_category_correction
+      table: message_reply_time
+      facebook_name: 'Tim Sugaipov'
       stopwords:
         - PLACEHOLDER
-        - fuck
-        - fucking
-        - shit
-        - really
-        - mean
-        - going
-        - gonna
-
 
   photo_mosaic:
     type: python
     class: photo_mosaic.RenderMosaic
     parameters:
       target: "python/img/target.jpg"
-      images: "python/messenger_data/user_1/photos"
+      user_data: "user_1" # name of the folder with messenger data usually looks like FriendName_chatId
       output: "python/img/mosaic.jpeg"
       grid:
         - 100
@@ -61,3 +54,15 @@ tasks:
       - youtube_links
     parameters:
       table: youtube_links
+      user: user_2
+      category: music
+
+  # Requires ImageMagick, link: https://imagemagick.org/
+  link_chart_race:
+    type: python
+    class: link_chart_race.ChartRace
+    parents:
+      - frequent_sites
+    parameters:
+      table: frequent_sites
+      fixed: False
