@@ -54,7 +54,7 @@ tasks:
       - youtube_links
     parameters:
       table: youtube_links
-      user: user_2
+      user: user_1
       category: music
 
   # Requires ImageMagick, link: https://imagemagick.org/

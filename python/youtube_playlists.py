@@ -6,6 +6,25 @@ from sayn import PythonTask
 
 class AutoPlaylist(PythonTask):
 
+    def get_existing_videos(self, playlist_id, existing_videos = [], nextPageToken = None):
+        request = self.youtube.playlistItems().list(
+            part="id,snippet",
+            maxResults=50,
+            playlistId=playlist_id,
+            pageToken=nextPageToken
+        )
+        response = request.execute()
+        playlist_length = int(response["pageInfo"]["totalResults"])
+        if len(existing_videos) < playlist_length:
+            for item in response["items"]:
+                existing_videos.append(item["snippet"]["resourceId"]["videoId"])
+            print(f"existing_videos: {len(existing_videos)} ")
+            if "nextPageToken" in response.keys():
+                self.get_existing_videos(playlist_id, existing_videos, response["nextPageToken"])
+
+        return existing_videos
+
+
     def run(self):
 
         table = self.project_parameters["user_prefix"]+ self.task_parameters["table"]
@@ -27,10 +46,10 @@ class AutoPlaylist(PythonTask):
 
         # using flow.authorized_session.
         session = flow.authorized_session()
-        youtube = googleapiclient.discovery.build(
+        self.youtube = googleapiclient.discovery.build(
             api_service_name, api_version, credentials=creds)
 
-        request = youtube.playlists().list(
+        request = self.youtube.playlists().list(
             part="id, snippet",
             mine=True
         )
@@ -38,10 +57,15 @@ class AutoPlaylist(PythonTask):
 
         check = [item['id'] for item in response["items"] if item["snippet"]["title"] == playlist_name]
 
+        list_of_ids =  df['video_id'].to_list()
+
         if len(check) > 0:
             playlist_id = check[0]
+            print(f"starting size:{len(list_of_ids)} ")
+            list_of_ids = list(set(list_of_ids)^set(self.get_existing_videos(playlist_id)))
+            print(f"ending size:{len(list_of_ids)} ")
         else:
-            request = youtube.playlists().insert(
+            request = self.youtube.playlists().insert(
                 part="snippet",
                 body={
                   "snippet": {
@@ -52,11 +76,11 @@ class AutoPlaylist(PythonTask):
             response = request.execute()
             playlist_id = response['id']
 
-        list_of_ids = df['video_id'].to_list()
         list_length = len(list_of_ids)
+        print(list_length)
 
         counter = 0
-        music_videos = []
+        category_videos = []
 
         while counter < list_length:
             if counter + 50 < list_length:
@@ -64,21 +88,21 @@ class AutoPlaylist(PythonTask):
             else:
                 video_ids = ",".join(list_of_ids[counter:list_length])
 
-            request = youtube.videos().list(part="topicDetails",id=video_ids)
+            request = self.youtube.videos().list(part="topicDetails",id=video_ids)
             response = request.execute()
 
             for x in response['items']:
                 try:
                     for value in x["topicDetails"]["topicCategories"]:
-                        if value.lower().find("music") != -1 :
-                            music_videos.append(x['id'])
+                        if value.lower().find(category) != -1 :
+                            category_videos.append(x['id'])
                             break
                 except:
                     pass
 
             counter+=50
 
-        for video in music_videos:
+        for video in category_videos:
             body = {
               "snippet": {
                 "playlistId": playlist_id,
@@ -88,7 +112,7 @@ class AutoPlaylist(PythonTask):
                 }
               }
             }
-            request = youtube.playlistItems().insert(
+            request = self.youtube.playlistItems().insert(
             part="snippet",
             body=body)
             try:

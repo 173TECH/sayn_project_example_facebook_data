@@ -1,10 +1,11 @@
+import json
+import pandas as pd
+import unicodedata as ud
 from sayn import PythonTask
 from os import listdir
 from datetime import datetime
 from urllib.parse import urlsplit
-import json
-import pandas as pd
-import unicodedata as ud
+
 
 
 class LoadData(PythonTask):
