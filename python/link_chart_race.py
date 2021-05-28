@@ -10,7 +10,6 @@ class ChartRace(PythonTask):
 
     def run(self):
 
-        colours = ['viridis', 'plasma', 'inferno', 'magma', 'cividis']
         table = self.project_parameters["user_prefix"]+ self.task_parameters["table"]
         fixed = self.task_parameters["fixed"]
         df = pd.DataFrame(self.default_db.read_data(f"SELECT * FROM {table}"))

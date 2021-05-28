@@ -18,7 +18,6 @@ class AutoPlaylist(PythonTask):
         if len(existing_videos) < playlist_length:
             for item in response["items"]:
                 existing_videos.append(item["snippet"]["resourceId"]["videoId"])
-            print(f"existing_videos: {len(existing_videos)} ")
             if "nextPageToken" in response.keys():
                 self.get_existing_videos(playlist_id, existing_videos, response["nextPageToken"])
 
@@ -61,9 +60,7 @@ class AutoPlaylist(PythonTask):
 
         if len(check) > 0:
             playlist_id = check[0]
-            print(f"starting size:{len(list_of_ids)} ")
             list_of_ids = list(set(list_of_ids)^set(self.get_existing_videos(playlist_id)))
-            print(f"ending size:{len(list_of_ids)} ")
         else:
             request = self.youtube.playlists().insert(
                 part="snippet",

@@ -15,4 +15,6 @@ SELECT chat_with
 
 FROM {{ user_prefix }}logs_chat_data
 
+WHERE type = 'Generic'
+
 ORDER BY 2 DESC
