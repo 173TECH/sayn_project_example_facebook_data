@@ -23,6 +23,7 @@ class RenderCloud(PythonTask):
             os.remove(i)
 
     def create_gif(self, images, chat_and_sender):
+        '''GIF generating function with image labels and fade transitions'''
         loaded_images = self.load_images(images)
         gif_images = []
         durations = []
@@ -71,10 +72,10 @@ class RenderCloud(PythonTask):
                               , contour_color= c_colour
                               , color_func = color_func1).generate(text)
 
-        # # store wordcloud image in "python/img"
-        #
+        # store wordcloud image in "python/img"
+
         wordcloud.to_file(f"python/img/{name}_wordcloud.png")
-        #
+
         # declare show=True if you want to show wordclouds
 
         if show:
@@ -111,10 +112,10 @@ class RenderCloud(PythonTask):
         with self.step("Generating clouds"):
 
             stopwords = STOPWORDS.update(self.parameters["stopwords"])
-            # self.info("Generating facebook_wordcloud.png")
-            # self.word_cloud("facebook", full_text, stopwords)
+            self.info("Generating facebook_wordcloud.png")
+            self.word_cloud("facebook", full_text, stopwords)
 
-            # Source specific wordclouds
+            # Timelapse wordcloud GIFs
 
             images = {}
 

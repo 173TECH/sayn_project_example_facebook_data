@@ -1,5 +1,6 @@
 tasks:
 
+  # Text counts and sentiment analysis
   nlp:
     type: python
     class: nlp.LanguageProcessing
@@ -10,7 +11,7 @@ tasks:
       text:
         - content
 
-  # Generates wordclouds for every link in load_data
+  # Generates wordcloud GIFs for every folder in messenger_data
   # The stopwords parameter adds additional stopwords to our task
   wordcloud:
     type: python
@@ -19,34 +20,24 @@ tasks:
       - message_reply_time
     parameters:
       table: message_reply_time
-      facebook_name: 'Tim Sugaipov'
+      facebook_name: 'Tim Sugaipov' # Your name on facebook
       stopwords:
         - PLACEHOLDER
 
+  # Generates a photo mosaic for all photos in a folder (folder name needs to be specified in user_data)
   photo_mosaic:
     type: python
     class: photo_mosaic.RenderMosaic
     parameters:
       target: "python/img/target.jpg"
-      user_data: "user_1" # name of the folder with messenger data usually looks like FriendName_chatId
+      user_data: "user_1" # name of the folder with the chat data usually looks like FriendName_chatId
       output: "python/img/mosaic.jpeg"
       grid:
         - 100
         - 100
 
-  sticker_collage:
-    type: python
-    class: collage_creator.RenderCollage
-    parameters:
-      images: "python/img/stickers_used"
-      output: "python/img/"
-      resolution:
-        - 1920
-        - 1080
-      grid:
-        - 10
-        - 10
-
+  # Generates a YouTube playlist for user and category specified
+  # Requires Google's OAuth 2.0 authorization credentials, more details here: https://developers.google.com/youtube/v3/guides/auth/client-side-web-apps
   youtube_playlists:
     type: python
     class: youtube_playlists.AutoPlaylist
@@ -54,10 +45,10 @@ tasks:
       - youtube_links
     parameters:
       table: youtube_links
-      user: user_1
-      category: music
+      user: user_1 # name of the folder with the chat data usually looks like FriendName_chatId
+      category: music # types of videos you want
 
-  # Requires ImageMagick, link: https://imagemagick.org/
+  # Requires ImageMagick, link: https://imagemagick.org/
   link_chart_race:
     type: python
     class: link_chart_race.ChartRace
