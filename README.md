@@ -5,7 +5,8 @@ For more details, you can see the documentation here: https://173tech.github.io/
 DAG of this project:
 ![ETL](/dag.png)
 
-
+<br>
+<br>
 
 Quick Overview:
 
@@ -19,8 +20,6 @@ Once you have the data:
 - Rename the file `sample_settings` to `settings` (this can be found in the root of the project)
 
 Note: If you have a large amount of chat data you should only select a subset of your data to avoid longer load times for certain tasks
-
-
 
 This project is made up of 9 tasks shown in the above diagram.
 
