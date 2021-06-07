@@ -27,10 +27,6 @@ Note: If you have a large amount of chat data you should only select a subset of
 <br>
 <br>
 
-This project is made up of 9 tasks shown in the above diagram.
-
-<br>
-
 Specific Task Requirements:
 
 wordcloud
