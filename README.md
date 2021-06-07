@@ -8,7 +8,7 @@ DAG of this project:
 
 Quick Overview:
 
-To run this project you will need your Facebook Messenger data in JSON format, you can get request it by doing the following:
+To run this project you will need your Facebook Messenger data in JSON format, you can request it by doing the following:
 - Settings & Privacy > Settings > Your Facebook Information > Download Your Information 
 - Change format to JSON and click Create File (this can take a while depending on your date range and media quality)
 
