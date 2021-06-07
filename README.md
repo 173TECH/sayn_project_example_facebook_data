@@ -28,6 +28,7 @@ Note: If you have a large amount of chat data you should only select a subset of
 <br>
 
 Dependencies:
+
 This project has a number of dependencies listed in requirements.txt, to install them please use `pip install -r requirements.txt`
 
 Specific Task Requirements:
