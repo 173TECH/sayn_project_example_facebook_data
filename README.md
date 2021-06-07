@@ -29,11 +29,11 @@ Note: If you have a large amount of chat data you should only select a subset of
 
 Specific Task Requirements:
 
-wordcloud
-- `facebook_name` parameter should be changed to your name on facebook
+- wordcloud:
+  - `facebook_name` parameter should be changed to your name on facebook
 
-photo_mosaic
-- `user_data` parameter should be set to name of the folder with the chat data (usually looks like FriendName_chatId)
+- photo_mosaic:
+  - `user_data` parameter should be set to name of the folder with the chat data (usually looks like FriendName_chatId)
 
 link_chart_race
 - Requires `ImageMagick` to be installed, link: link: https://imagemagick.org/
