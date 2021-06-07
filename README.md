@@ -2,6 +2,7 @@ This is an example SAYN project. It shows you how to implement and use SAYN for 
 
 For more details, you can see the documentation here: https://173tech.github.io/sayn/
 
+DAG of this project:
 ![ETL](/dag.png)
 
 
