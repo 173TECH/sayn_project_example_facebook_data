@@ -40,6 +40,6 @@ Specific Task Requirements:
 
 - youtube_playlists
   - Requires a YouTube Channel
-  - Requires Google's OAuth 2.0 authorisation credentials, more details here: https://developers.google.com/youtube/v3/guides/auth/client-side-web-apps
+  - Requires enabling the YouTube Data API and Google's OAuth 2.0 authorisation credentials, more details here: https://developers.google.com/youtube/v3/guides/auth/client-side-web-apps
   - Once you have the credentials, add them to the `sample_secrets` folder and rename the file to `client_secrets`, rename `sample_secrets` folder to `secrets`
   - `user` parameter should be set to name of the folder with the chat data (usually looks like FriendName_chatId)
