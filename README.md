@@ -35,7 +35,7 @@ Specific Task Requirements:
   - `user_data` parameter should be set to name of the folder with the chat data (usually looks like FriendName_chatId)
 
 - link_chart_race
-  - Requires `ImageMagick` to be installed, link: link: https://imagemagick.org/
+  - Requires `ImageMagick` to be installed, link: https://imagemagick.org/
 
 - youtube_playlists
   - Requires a YouTube Channel
