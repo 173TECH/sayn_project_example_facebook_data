@@ -19,14 +19,10 @@ Once you have the data:
 - Copy the folder called `inbox` inside the `messages` subfolder and paste it inside the `python` folder of the project
 - Rename the `inbox` folder to `messenger_data`
 - Rename the file `sample_settings` to `settings` (this can be found in the root of the project)
+- Install dependencies using `pip install -r requirements.txt`
+- Run the project using `sayn run`, please note that certain tasks will not run if their specific requirements are not satisfied, more details below
 
 Note: If you have a large amount of chat data you should only select a subset of your data to avoid longer load times for certain tasks
-
-<br>
-
-Dependencies:
-
-This project has a number of dependencies listed in requirements.txt, to install them please use `pip install -r requirements.txt`
 
 <br>
 
