@@ -2,6 +2,9 @@ This is an example SAYN project. It shows you how to implement and use SAYN for 
 
 For more details, you can see the documentation here: https://173tech.github.io/sayn/
 
+<br>
+<br>
+
 DAG of this project:
 ![ETL](/dag.png)
 
@@ -21,8 +24,12 @@ Once you have the data:
 
 Note: If you have a large amount of chat data you should only select a subset of your data to avoid longer load times for certain tasks
 
+<br>
+<br>
+
 This project is made up of 9 tasks shown in the above diagram.
 
+<br>
 
 Specific Task Requirements:
 
