@@ -7,7 +7,6 @@ from PIL import Image, ImageDraw, ImageFont
 from wordcloud import WordCloud, STOPWORDS, get_single_color_func
 
 
-
 class RenderCloud(PythonTask):
     def load_images(self, images):
         out_images = []
@@ -23,7 +22,7 @@ class RenderCloud(PythonTask):
             os.remove(i)
 
     def create_gif(self, images, chat_and_sender):
-        '''GIF generating function with image labels and fade transitions'''
+        """GIF generating function with image labels and fade transitions"""
         loaded_images = self.load_images(images)
         gif_images = []
         durations = []
@@ -32,24 +31,35 @@ class RenderCloud(PythonTask):
                 img1, img2 = loaded_images[-1], loaded_images[0]
                 title1, title2 = images[-1][-18:-14], images[0][-18:-14]
             else:
-                img1, img2 = loaded_images[i-1], loaded_images[i]
-                title1, title2 = images[i-1][-18:-14], images[i][-18:-14]
+                img1, img2 = loaded_images[i - 1], loaded_images[i]
+                title1, title2 = images[i - 1][-18:-14], images[i][-18:-14]
             d1, d2 = ImageDraw.Draw(img1), ImageDraw.Draw(img2)
             font = ImageFont.truetype("OpenSans-Bold.ttf", 50)
-            d1.text((0,0), title1, font=font, fill=(0, 0, 0))
-            d2.text((0,0), title2, font=font, fill=(0, 0, 0))
-            gif_images.extend([Image.blend(img1, img2, a/5) for a in range(0,6)])
-            durations.extend([1000 if t in (0,5) else 1 for t in range(0,6)])
+            d1.text((0, 0), title1, font=font, fill=(0, 0, 0))
+            d2.text((0, 0), title2, font=font, fill=(0, 0, 0))
+            gif_images.extend([Image.blend(img1, img2, a / 5) for a in range(0, 6)])
+            durations.extend([1000 if t in (0, 5) else 1 for t in range(0, 6)])
         file_path = f"python/img/{chat_and_sender}_timelapse.gif"
-        gif_images[0].save(file_path
-                           , save_all = True
-                           , append_images=gif_images[1:]
-                           , optimize = False
-                           , duration = durations
-                           , loop = 0)
+        gif_images[0].save(
+            file_path,
+            save_all=True,
+            append_images=gif_images[1:],
+            optimize=False,
+            duration=durations,
+            loop=0,
+        )
         self.remove_images(images)
 
-    def word_cloud(self, name, text, stopwords, b_colour = "white", c_colour = "black", show=False, sender=None):
+    def word_cloud(
+        self,
+        name,
+        text,
+        stopwords,
+        b_colour="white",
+        c_colour="black",
+        show=False,
+        sender=None,
+    ):
         """Word cloud generating function"""
 
         # attempt to find a compatible mask
@@ -62,15 +72,17 @@ class RenderCloud(PythonTask):
         except:
             mask = None
 
-        color_func1 = get_single_color_func('deepskyblue')
+        color_func1 = get_single_color_func("deepskyblue")
 
-        wordcloud = WordCloud(stopwords=stopwords
-                              , max_words=50
-                              , mask=mask
-                              , background_color = b_colour
-                              , contour_width=3
-                              , contour_color= c_colour
-                              , color_func = color_func1).generate(text)
+        wordcloud = WordCloud(
+            stopwords=stopwords,
+            max_words=50,
+            mask=mask,
+            background_color=b_colour,
+            contour_width=3,
+            contour_color=c_colour,
+            color_func=color_func1,
+        ).generate(text)
 
         # store wordcloud image in "python/img"
 
@@ -83,18 +95,11 @@ class RenderCloud(PythonTask):
             plt.axis("off")
             plt.show()
 
-        return (wordcloud)
-
+        return wordcloud
 
     def setup(self):
-        self.set_run_steps(
-            [
-                "Grouping texts",
-                "Generating clouds"
-            ]
-        )
+        self.set_run_steps(["Grouping texts", "Generating clouds"])
         return self.success()
-
 
     def run(self):
 
@@ -102,12 +107,15 @@ class RenderCloud(PythonTask):
 
             table = self.parameters["user_prefix"] + self.task_parameters["table"]
 
-            df = pd.DataFrame(self.default_db.read_data(f"SELECT * FROM {table} WHERE type = 'Generic' AND content != 'no_data'"))
+            df = pd.DataFrame(
+                self.default_db.read_data(
+                    f"SELECT * FROM {table} WHERE type = 'Generic' AND content != 'no_data'"
+                )
+            )
             full_text = " ".join(article for article in df.content)
 
-            sources = df.groupby(by = ["chat_with","sender_name", "year"])
+            sources = df.groupby(by=["chat_with", "sender_name", "year"])
             grouped_texts = sources.content.sum()
-
 
         with self.step("Generating clouds"):
 
