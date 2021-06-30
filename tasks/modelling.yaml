@@ -5,11 +5,6 @@ tasks:
     parents:
       - load_chat_data
 
-  youtube_links:
-    preset: modelling
-    parents:
-      - load_chat_data
-
   frequent_sites:
     preset: modelling
     parents:

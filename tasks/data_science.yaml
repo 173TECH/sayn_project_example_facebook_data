@@ -20,33 +20,9 @@ tasks:
       - message_reply_time
     parameters:
       table: message_reply_time
-      facebook_name: 'Tim Sugaipov' # Your name on facebook
+      facebook_name: 'Vegeta' # Your name on facebook
       stopwords:
         - PLACEHOLDER
-
-  # Generates a photo mosaic for all photos in a folder (folder name needs to be specified in user_data)
-  photo_mosaic:
-    type: python
-    class: photo_mosaic.RenderMosaic
-    parameters:
-      target: "python/img/target.jpg"
-      user_data: "user_1" # name of the folder with the chat data usually looks like FriendName_chatId
-      output: "python/img/mosaic.jpeg"
-      grid:
-        - 100
-        - 100
-
-  # Generates a YouTube playlist for user and category specified
-  # Requires Google's OAuth 2.0 authorization credentials, more details here: https://developers.google.com/youtube/v3/guides/auth/client-side-web-apps
-  youtube_playlists:
-    type: python
-    class: youtube_playlists.AutoPlaylist
-    parents:
-      - youtube_links
-    parameters:
-      table: youtube_links
-      user: user_1 # name of the folder with the chat data usually looks like FriendName_chatId
-      category: music # types of videos you want
 
   # Requires ImageMagick, link: https://imagemagick.org/
   link_chart_race:

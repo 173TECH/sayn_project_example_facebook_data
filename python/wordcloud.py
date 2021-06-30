@@ -1,7 +1,7 @@
+import os
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-import os
 from sayn import PythonTask
 from PIL import Image, ImageDraw, ImageFont
 from wordcloud import WordCloud, STOPWORDS, get_single_color_func
@@ -9,6 +9,7 @@ from wordcloud import WordCloud, STOPWORDS, get_single_color_func
 
 class RenderCloud(PythonTask):
     def load_images(self, images):
+        """Loads images used to construct the GIF"""
         out_images = []
         for i in images:
             img = Image.open(open(i, "rb"))
@@ -17,7 +18,7 @@ class RenderCloud(PythonTask):
         return out_images
 
     def remove_images(self, images):
-
+        """Removes images used to construct the GIF"""
         for i in images:
             os.remove(i)
 
@@ -112,7 +113,6 @@ class RenderCloud(PythonTask):
                     f"SELECT * FROM {table} WHERE type = 'Generic' AND content != 'no_data'"
                 )
             )
-            full_text = " ".join(article for article in df.content)
 
             sources = df.groupby(by=["chat_with", "sender_name", "year"])
             grouped_texts = sources.content.sum()
@@ -120,8 +120,6 @@ class RenderCloud(PythonTask):
         with self.step("Generating clouds"):
 
             stopwords = STOPWORDS.update(self.parameters["stopwords"])
-            self.info("Generating facebook_wordcloud.png")
-            self.word_cloud("facebook", full_text, stopwords)
 
             # Timelapse wordcloud GIFs
 
@@ -139,6 +137,7 @@ class RenderCloud(PythonTask):
                     images[chat_and_sender] = [f"python/img/{name}_wordcloud.png"]
 
             for key in images.keys():
-                self.create_gif(images[key], key)
+                if len(images[key]) > 1:
+                    self.create_gif(images[key], key)
 
         return self.success()

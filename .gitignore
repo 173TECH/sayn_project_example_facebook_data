@@ -1,18 +1,13 @@
 # SAYN ignores
 /compile/
 /logs/
-/python/messenger_data
 settings.yaml
 dev.db
 prod.db
 .git
 .DS_Store
 *_wordcloud.png
-*_collage.png
 *.gif
-mosaic.jpeg
-/python/img/stickers_used
-/secrets/
 
 
 # Python ignores
