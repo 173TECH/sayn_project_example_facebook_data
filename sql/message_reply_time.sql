@@ -4,6 +4,7 @@ SELECT chat_with
      , created_dt
      , STRFTIME('%Y', created_dt) AS year
      , STRFTIME('%Y-%m', created_dt) AS month
+     --- Reply time calculation, includes a cutoff for extremely delayed replies (default: 600000000 milliseconds ~ aprox. 7 days)
      , CASE WHEN sender_name != LAG(sender_name) OVER (PARTITION BY chat_with ORDER BY timestamp_ms)
             AND (timestamp_ms - LAG(timestamp_ms) OVER (PARTITION BY chat_with ORDER BY timestamp_ms)) < 600000000 THEN
             (timestamp_ms - LAG(timestamp_ms) OVER (PARTITION BY chat_with ORDER BY timestamp_ms))/1000

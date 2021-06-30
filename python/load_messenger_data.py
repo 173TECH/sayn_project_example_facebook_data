@@ -59,11 +59,6 @@ class LoadData(PythonTask):
                     except NameError:
                         main_df = temp_df
 
-            # Anonymise friends (remove when released)
-            # main_df.loc[main_df.sender_name != "Tim Sugaipov", "sender_name"] = main_df[
-            #     "chat_with"
-            # ]
-
             # Convert UNIX timestamps
             main_df["created_dt"] = main_df["timestamp_ms"].apply(
                 self.convert_time, args=("%Y-%m-%d",)
