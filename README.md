@@ -1,6 +1,6 @@
 # SAYN Project Example: Facebook Data Analysis
 
-## Project Description
+## Project Description
 
 This is an example [SAYN](https://173tech.github.io/sayn/) project. It shows you how to implement and use SAYN for data processing and modelling.
 
@@ -17,7 +17,7 @@ If everything was run correctly you should see 3 new files in `python/img`, thes
 - sample_Vegeta_timelapse.gif
 - chart_race.gif
 
-## Using Your Own Data
+## Using Your Own Data
 
 For this you will need your Facebook Messenger data in JSON format, you can get request it by doing the following:
 - Settings & Privacy > Settings > Your Facebook Information > Download Your Information 
