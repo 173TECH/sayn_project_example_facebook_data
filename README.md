@@ -12,7 +12,7 @@ To run the project, you will need to:
 - install `ImageMagick`, details here: https://imagemagick.org/
 - use `sayn run` from the root of the project folder to run all SAYN commands.
 
-After a succesful run you should see 3 new files in `python/img`, these should be the following:
+After a successful run you should see 3 new files in `python/img`, these should be the following:
 - sample_Goku_timelapse.gif
 - sample_Vegeta_timelapse.gif
 - chart_race.gif
